@@ -3,177 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pancracio World</title>
+    <title>¿Quién eres?</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; overflow: hidden; font-family: 'Press Start 2P', cursive; background: #5c94fc; width: 100vw; height: 100vh; }
+        body { margin: 0; overflow: hidden; font-family: 'Press Start 2P', cursive; background: #1a1a1a; color: white; }
         
-        /* PANTALLA INICIAL */
+        /* Pantalla de Inicio */
         #inicio {
             position: fixed; inset: 0; background: #000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100;
         }
-        #inicio h1 { color: #fff; font-size: 18px; text-align: center; margin-bottom: 40px; line-height: 2; }
-        #btn-play { background: #e7691d; color: #fff; border: 4px solid #fff; padding: 20px 40px; font-family: 'Press Start 2P'; font-size: 15px; border-radius: 10px; }
+        h1 { font-size: 18px; text-align: center; line-height: 2; margin-bottom: 30px; color: #ff00ff; }
+        #btn-start { 
+            background: #00ff00; color: #000; border: 4px solid #fff; padding: 20px; 
+            font-family: 'Press Start 2P'; cursor: pointer; font-size: 14px;
+        }
 
-        /* ESCENARIO */
-        #mundo { display: none; width: 100%; height: 100%; position: relative; overflow: hidden; }
-        .pasto { position: absolute; bottom: 0; width: 100%; height: 100px; background: #71aa34; border-top: 6px solid #3e611d; z-index: 10; }
-        .rio { position: absolute; bottom: 0; left: 40%; width: 80px; height: 70px; background: #4d92d4; z-index: 11; border-top: 4px solid #fff; }
+        /* Área de juego */
+        #juego { display: none; width: 100vw; height: 100vh; background: radial-gradient(#333, #000); position: relative; }
         
-        /* DECORACIÓN */
-        .nube { position: absolute; background: #fff; width: 60px; height: 25px; border-radius: 20px; top: 50px; opacity: 0.8; }
-        .arbol { position: absolute; bottom: 100px; width: 40px; height: 60px; background: #2d4d1a; border-radius: 20px 20px 0 0; }
-
-        /* PERSONAJE */
-        #pancracio { 
-            position: absolute; bottom: 100px; left: 30px; width: 40px; height: 40px; 
-            background: #ff4500; border: 3px solid #000; z-index: 100;
-            transition: bottom 0.25s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        .burbuja {
+            position: absolute; width: 80px; height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
+            animation: flotar 4s infinite ease-in-out;
+            cursor: pointer;
         }
 
-        /* OBJETOS */
-        .star { 
-            position: absolute; width: 30px; height: 30px; background: #ffff00; 
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            box-shadow: 0 0 15px gold; z-index: 50;
-        }
-        #llave-caja { 
-            position: absolute; right: 30px; bottom: 100px; width: 60px; height: 60px; 
-            background: #8b4513; border: 4px solid #5d2e0d; display: none;
-            justify-content: center; align-items: center; font-size: 30px; z-index: 90;
+        .burbuja::after { /* Efecto de brillo de burbuja */
+            content: ''; position: absolute; top: 15%; left: 15%;
+            width: 20px; height: 10px; background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%; transform: rotate(-45deg);
         }
 
-        /* CONTROLES */
-        #ui-controles {
-            position: absolute; bottom: 20px; width: 100%;
-            display: flex; justify-content: space-evenly; z-index: 500;
-        }
-        .btn-game {
-            background: rgba(0,0,0,0.8); color: #fff; border: 3px solid #fff;
-            width: 80px; height: 60px; display: flex; justify-content: center; align-items: center;
-            border-radius: 15px; font-family: 'Press Start 2P'; font-size: 10px;
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
         }
 
-        #puntos { position: absolute; top: 20px; left: 20px; color: #fff; font-size: 12px; z-index: 600; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 5px; }
-        
-        /* MENSAJE FINAL */
-        #final {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            flex-direction: column; justify-content: center; align-items: center;
-            color: #ffff00; text-align: center; z-index: 2000; padding: 20px;
+        /* Texto que sale de la burbuja */
+        .palabra-flotante {
+            position: absolute; font-size: 12px; color: #ffff00;
+            text-shadow: 2px 2px #ff0000; pointer-events: none;
+            animation: subirYDesaparecer 2s forwards;
         }
-        #final h2 { text-shadow: 4px 4px #ff0000; font-size: 20px; line-height: 1.6; }
+
+        @keyframes subirYDesaparecer {
+            0% { transform: translateY(0); opacity: 1; scale: 1; }
+            100% { transform: translateY(-100px); opacity: 0; scale: 1.5; }
+        }
+
+        #instrucciones { position: absolute; top: 20px; width: 100%; text-align: center; font-size: 10px; color: #555; }
     </style>
 </head>
 <body>
 
     <div id="inicio">
         <h1>¿QUIÉN<br>ERES?</h1>
-        <button id="btn-play" onclick="empezar()">JUGAR</button>
+        <button id="btn-start" onclick="iniciar()">INICIAR</button>
     </div>
 
-    <div id="mundo">
-        <div id="puntos">STARS: <span id="val">0</span>/5</div>
-        
-        <div class="nube" style="left: 10%;"></div>
-        <div class="nube" style="left: 60%; top: 100px;"></div>
-        <div class="arbol" style="left: 20%;"></div>
-        <div class="arbol" style="left: 80%;"></div>
-        
-        <div class="rio"></div>
-        <div class="pasto"></div>
-        
-        <div id="pancracio"></div>
-        <div id="llave-caja">🎁</div>
-
-        <div id="ui-controles">
-            <button class="btn-game" ontouchstart="mover(-1)" ontouchend="parar()">IZQ</button>
-            <button class="btn-game" ontouchstart="saltar()">SALTAR</button>
-            <button class="btn-game" ontouchstart="mover(1)" ontouchend="parar()">DER</button>
-        </div>
-    </div>
-
-    <div id="final">
-        <h2>¡ERES UN PANCRACIO, PANCRACIO! 😂</h2>
-        <button onclick="location.reload()" style="margin-top:40px; padding:10px; font-family:'Press Start 2P';">REINTENTAR</button>
+    <div id="juego">
+        <div id="instrucciones">¡REVIENTA LAS BURBUJAS!</div>
     </div>
 
     <script>
-        let starsFound = 0;
-        let x = 30;
-        let y = 100;
-        let isJumping = false;
-        let timer;
-        const player = document.getElementById('pancracio');
-        const box = document.getElementById('llave-caja');
-
-        function empezar() {
+        const palabras = ["Pancracio", "Austrolopitecus", "Cheto", "Alonso", "Ñoñito", "Ser Gor", "Valentino"];
+        
+        function iniciar() {
             document.getElementById('inicio').style.display = 'none';
-            document.getElementById('mundo').style.display = 'block';
-            spawnStars();
-            // Loop de colisiones
-            setInterval(check, 10);
-        }
-
-        function spawnStars() {
-            for(let i=0; i<5; i++) {
-                let s = document.createElement('div');
-                s.className = 'star';
-                s.style.left = (80 + (i * (window.innerWidth / 6))) + 'px';
-                s.style.bottom = (180 + Math.random() * 40) + 'px'; 
-                document.getElementById('mundo').appendChild(s);
-            }
-        }
-
-        function mover(dir) {
-            if(timer) clearInterval(timer);
-            timer = setInterval(() => {
-                x += dir * 7;
-                if(x < 0) x = 0;
-                if(x > window.innerWidth - 40) x = window.innerWidth - 40;
-                player.style.left = x + 'px';
-            }, 20);
-        }
-
-        function parar() { clearInterval(timer); }
-
-        function saltar() {
-            if(!isJumping) {
-                isJumping = true;
-                y = 220; // Altura del salto
-                player.style.bottom = y + 'px';
-                setTimeout(() => {
-                    y = 100; // Vuelve al suelo
-                    player.style.bottom = y + 'px';
-                    setTimeout(() => { isJumping = false; }, 200);
-                }, 300);
-            }
-        }
-
-        function check() {
-            const pRect = player.getBoundingClientRect();
+            document.getElementById('juego').style.display = 'block';
             
-            // Estrellas
-            document.querySelectorAll('.star').forEach(s => {
-                const sRect = s.getBoundingClientRect();
-                if (!(pRect.right < sRect.left || pRect.left > sRect.right || pRect.bottom < sRect.top || pRect.top > sRect.bottom)) {
-                    s.remove();
-                    starsFound++;
-                    document.getElementById('val').innerText = starsFound;
-                    if(starsFound === 5) box.style.display = 'flex';
-                }
-            });
-
-            // Caja Final
-            if(starsFound === 5) {
-                const bRect = box.getBoundingClientRect();
-                if (!(pRect.right < bRect.left || pRect.left > bRect.right || pRect.bottom < bRect.top || pRect.top > bRect.bottom)) {
-                    document.getElementById('final').style.display = 'flex';
-                }
-            }
+            // Crear burbujas continuamente
+            setInterval(crearBurbuja, 800);
         }
-    </script>
-</body>
-</html>
+
+        function crearBurbuja() {
+            const b = document.createElement('div');
+            b.className = 'burbuja';
+            
+            // Posición aleatoria
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 150) + 50;
+            
+            b.style.left = x + 'px';
+            b.style.top = y + 'px';
+            
+            // Al hacer clic o tocar
+            b.onclick = function() {
+                reventar(x, y);
+                b.remove();
+            };
+            b.ontouchstart = function(e) {
+                e.preventDefault

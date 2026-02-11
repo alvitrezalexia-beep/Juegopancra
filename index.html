@@ -3,167 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pancracio Adventure</title>
+    <title>Pancracio Game</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* Ajustes base para móvil */
-        body { margin: 0; overflow: hidden; font-family: 'Press Start 2P', cursive; background: #5c94fc; touch-action: none; }
+        * { box-sizing: border-box; }
+        body { margin: 0; overflow: hidden; font-family: 'Press Start 2P', cursive; background: #5c94fc; width: 100vw; height: 100vh; }
         
-        /* Pantalla de Inicio Estilo Mario */
+        /* Pantalla de Inicio */
         #pantalla-inicio {
             position: fixed; inset: 0; background: #000;
             display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100;
         }
-        #pantalla-inicio h1 { color: #fff; font-size: 16px; text-align: center; line-height: 2; margin-bottom: 40px; }
-        #btn-iniciar { 
-            background: #e7691d; color: white; border: 4px solid #fff; padding: 15px 25px; 
-            font-family: 'Press Start 2P'; font-size: 12px; cursor: pointer;
-        }
+        h1 { color: #fff; font-size: 14px; text-align: center; margin-bottom: 30px; }
 
-        /* Escenario */
-        #juego { display: none; width: 100vw; height: 100vh; position: relative; background: linear-gradient(#5c94fc, #92b1fe); }
-        .pasto { position: absolute; bottom: 0; width: 100%; height: 100px; background: #71aa34; border-top: 6px solid #3e611d; }
-        
-        /* Elementos Decorativos */
-        .nube { position: absolute; background: white; width: 60px; height: 20px; border-radius: 20px; opacity: 0.8; }
-        .arbol { position: absolute; bottom: 100px; width: 40px; height: 60px; background: #3e611d; border-radius: 10px 10px 0 0; }
-        .rio { position: absolute; bottom: 0; left: 150px; width: 100px; height: 80px; background: #4d92d4; border-top: 4px solid #fff; }
+        /* Contenedor del Juego */
+        #juego { display: none; width: 100%; height: 100%; position: relative; }
+        .pasto { position: absolute; bottom: 0; width: 100%; height: 80px; background: #71aa34; border-top: 4px solid #3e611d; }
+        .rio { position: absolute; bottom: 0; left: 30%; width: 60px; height: 60px; background: #4d92d4; }
 
-        /* Personaje y Objetos */
+        /* Personaje */
         #player { 
-            position: absolute; bottom: 100px; left: 30px; width: 35px; height: 35px; 
-            background: #ff4500; border: 3px solid #000; z-index: 10; transition: transform 0.1s;
+            position: absolute; bottom: 80px; left: 20px; width: 30px; height: 30px; 
+            background: #ff4500; border: 2px solid #000; z-index: 10; transition: transform 0.1s ease-out;
         }
+
+        /* Estrellas bajitas */
         .estrella { 
-            position: absolute; width: 25px; height: 25px; background: #ffd700; 
+            position: absolute; width: 20px; height: 20px; background: gold; 
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            box-shadow: 0 0 10px gold;
+            z-index: 5;
         }
+
+        /* Caja y Llave */
         .caja { 
-            position: absolute; right: 20px; bottom: 100px; width: 50px; height: 50px; 
-            background: #8b4513; border: 4px solid #5d2e0d; display: none;
-            justify-content: center; align-items: center; color: gold; font-size: 20px;
+            position: absolute; right: 15px; bottom: 80px; width: 45px; height: 45px; 
+            background: #8b4513; border: 3px solid #5d2e0d; display: none;
+            justify-content: center; align-items: center; font-size: 18px;
         }
 
-        /* Controles Táctiles */
+        /* Controles ajustados */
         #controles {
-            position: absolute; bottom: 20px; width: 100%;
-            display: flex; justify-content: space-around; z-index: 50;
+            position: absolute; bottom: 10px; width: 100%;
+            display: flex; justify-content: space-evenly; z-index: 50;
         }
-        .btn-control {
-            background: rgba(0,0,0,0.6); color: white; border: 2px solid white;
-            padding: 18px; border-radius: 12px; font-family: 'Press Start 2P'; font-size: 10px;
+        .btn {
+            background: rgba(0,0,0,0.7); color: white; border: 2px solid #fff;
+            padding: 15px; font-family: 'Press Start 2P'; font-size: 9px; border-radius: 8px;
         }
 
-        #marcador { position: absolute; top: 20px; left: 20px; color: white; font-size: 12px; z-index: 60; }
-        
-        /* Mensaje Final */
+        #marcador { position: absolute; top: 10px; left: 10px; color: white; font-size: 10px; z-index: 60; }
         #mensaje-final {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
             flex-direction: column; justify-content: center; align-items: center;
-            color: #ffff00; text-shadow: 4px 4px #ff0000; font-size: 18px; text-align: center; z-index: 200; padding: 20px;
+            color: yellow; text-align: center; z-index: 200; font-size: 14px; padding: 20px;
         }
     </style>
 </head>
 <body>
 
     <div id="pantalla-inicio">
-        <h1>¿QUIÉN<br>ERES?</h1>
-        <button id="btn-iniciar" onclick="iniciar()">JUGAR</button>
+        <h1>¿QUIÉN ERES?</h1>
+        <button onclick="iniciar()" style="padding:10px; font-family:'Press Start 2P';">JUGAR</button>
     </div>
 
     <div id="juego">
-        <div id="marcador">ESTRELLAS: <span id="puntos">0</span>/5</div>
-        <div class="nube" style="top:50px; left:20%;"></div>
-        <div class="nube" style="top:80px; left:70%;"></div>
-        <div class="arbol" style="left:50px;"></div>
-        <div class="arbol" style="left:280px;"></div>
+        <div id="marcador">ESTRELLAS: <span id="p">0</span>/5</div>
         <div class="rio"></div>
         <div class="pasto"></div>
-        
         <div id="player"></div>
         <div id="caja" class="caja">🔑</div>
 
         <div id="controles">
-            <button class="btn-control" ontouchstart="moverse(-1)" ontouchend="parar()">IZQ</button>
-            <button class="btn-control" ontouchstart="saltar()">SALTAR</button>
-            <button class="btn-control" ontouchstart="moverse(1)" ontouchend="parar()">DER</button>
+            <button class="btn" ontouchstart="mv(-1)" ontouchend="st()">IZQ</button>
+            <button class="btn" ontouchstart="jp()">SALTAR</button>
+            <button class="btn" ontouchstart="mv(1)" ontouchend="st()">DER</button>
         </div>
     </div>
 
     <div id="mensaje-final">
         <p>¡ERES UN PANCRACIO, PANCRACIO! 😂</p>
-        <button onclick="location.reload()" style="font-family:'Press Start 2P'; margin-top:20px;">REINTENTAR</button>
+        <button onclick="location.reload()" style="margin-top:20px; font-family:'Press Start 2P';">VOLVER</button>
     </div>
 
     <script>
-        let score = 0; let posX = 30; let posY = 0; let jumpActive = false; let moveTimer;
-        const player = document.getElementById('player');
+        let s = 0, px = 20, py = 0, jm = false, mt;
+        const pl = document.getElementById('player');
 
         function iniciar() {
             document.getElementById('pantalla-inicio').style.display = 'none';
             document.getElementById('juego').style.display = 'block';
-            generarEstrellas();
-        }
-
-        function generarEstrellas() {
             for(let i=0; i<5; i++) {
-                let star = document.createElement('div');
-                star.className = 'estrella';
-                star.style.left = (100 + (i * 60)) + 'px';
-                star.style.top = (250 + (Math.random() * 100)) + 'px';
-                document.getElementById('juego').appendChild(star);
+                let st = document.createElement('div');
+                st.className = 'estrella';
+                // Posición horizontal repartida y altura baja (entre 120px y 180px del suelo)
+                st.style.left = (60 + (i * (window.innerWidth/6))) + 'px';
+                st.style.bottom = (130 + (Math.random() * 40)) + 'px'; 
+                document.getElementById('juego').appendChild(st);
             }
         }
 
-        function moverse(dir) {
-            if(moveTimer) clearInterval(moveTimer);
-            moveTimer = setInterval(() => {
-                posX += dir * 8;
-                if(posX < 0) posX = 0;
-                if(posX > window.innerWidth - 40) posX = window.innerWidth - 40;
-                player.style.left = posX + 'px';
-                revisarColisiones();
-            }, 30);
+        function mv(d) {
+            mt = setInterval(() => {
+                px += d * 6;
+                if(px < 0) px = 0;
+                if(px > window.innerWidth - 30) px = window.innerWidth - 30;
+                pl.style.left = px + 'px';
+                ck();
+            }, 20);
         }
-
-        function parar() { clearInterval(moveTimer); }
-
-        function saltar() {
-            if(!jumpActive) {
-                jumpActive = true;
-                posY = 120;
-                player.style.transform = `translateY(-${posY}px)`;
+        function st() { clearInterval(mt); }
+        function jp() {
+            if(!jm) {
+                jm = true;
+                pl.style.transform = "translateY(-90px)"; // Altura de salto ajustada
                 setTimeout(() => {
-                    posY = 0;
-                    player.style.transform = `translateY(0)`;
-                    setTimeout(() => { jumpActive = false; }, 300);
+                    pl.style.transform = "translateY(0)";
+                    setTimeout(() => { jm = false; }, 200);
                 }, 300);
             }
         }
 
-        function revisarColisiones() {
-            const pRect = player.getBoundingClientRect();
-            
-            // Estrellas
-            document.querySelectorAll('.estrella').forEach(s => {
-                const sRect = s.getBoundingClientRect();
-                if(!(pRect.right < sRect.left || pRect.left > sRect.right || pRect.bottom < sRect.top || pRect.top > sRect.bottom)) {
-                    s.remove();
-                    score++;
-                    document.getElementById('puntos').innerText = score;
-                    if(score === 5) document.getElementById('caja').style.display = 'flex';
+        function ck() {
+            const pr = pl.getBoundingClientRect();
+            document.querySelectorAll('.estrella').forEach(e => {
+                const er = e.getBoundingClientRect();
+                if(!(pr.right<er.left || pr.left>er.right || pr.bottom<er.top || pr.top>er.bottom)) {
+                    e.remove(); s++; document.getElementById('p').innerText = s;
+                    if(s === 5) document.getElementById('caja').style.display = 'flex';
                 }
             });
-
-            // Caja Final
-            const caja = document.getElementById('caja');
-            const cRect = caja.getBoundingClientRect();
-            if(score === 5 && !(pRect.right < cRect.left || pRect.left > cRect.right || pRect.bottom < cRect.top || pRect.top > cRect.bottom)) {
+            const cj = document.getElementById('caja');
+            const cr = cj.getBoundingClientRect();
+            if(s === 5 && !(pr.right<cr.left || pr.left>cr.right || pr.bottom<cr.top || pr.top>cr.bottom)) {
                 document.getElementById('mensaje-final').style.display = 'flex';
             }
         }
     </script>
 </body>
 </html>
- 
